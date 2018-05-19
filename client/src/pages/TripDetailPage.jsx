@@ -13,16 +13,54 @@ class TripDetail extends React.Component {
     this.toggleAddView = this.toggleAddView.bind(this)
     this.updateValue = this.updateValue.bind(this)
     this.showEdit = this.showEdit.bind(this)
+    this.upVote = this.upVote.bind(this)
+    this.downVote = this.downVote.bind(this)
+    this.getUpvotersByName = this.getUpvotersByName.bind(this)
+    this.getDownvotersByName = this.getDownvotersByName.bind(this)
     this.state = {
       addActivityView: false,
       activityName: '',
       activityType: '',
       activityLevel: '',
       showEdit: false,
-      editActivityKey: null
+      editActivityKey: null,
     }
   }
+
+  getUpvotersByName(activityId){
+    this.props.actions.getUpvoters(activityId)
+  }
+
+  getDownvotersByName(activityId){
+    this.props.actions.getdownvoters(activityId)
+  }
   
+  upVote(activityId, activityDate){
+    const userId = this.props.userState.currentUser.id
+    const tripId = this.props.tripState.currentTrip.trip_id
+    let upVoteObj = {
+      activityId,
+      userId,
+      tripId,
+      activityDate,
+    }
+    console.log('upvoteObj:', upVoteObj)
+    this.props.actions.upVote(upVoteObj)
+  }
+
+  downVote(activityId, activityDate){
+    const userId = this.props.userState.currentUser.id
+    const tripId = this.props.tripState.currentTrip.trip_id
+    let downVoteObj = {
+      activityId,
+      userId,
+      tripId,
+      activityDate,
+    }
+    console.log('upvoteObj:', downVoteObj)
+    this.props.actions.downVote(downVoteObj)
+  }
+
   toggleAddView(){
     let changeView = !this.state.addActivityView;
     this.setState({
@@ -99,8 +137,6 @@ class TripDetail extends React.Component {
       <div>
         <h1>Trip Details: Day {dayNumber+1} in {currentTrip.title}</h1>
         <input id="activityName" placeholder="Activity Name" ref={activityName => this.activityName = activityName} />
-        {/* <input id="activityType" placeholder="Activity Type" ref={activityType => this.activityType = activityType} />
-        <input id="activityLevel" placeholder="Activity Level" ref={activityLevel => this.activityLevel = activityLevel} /> */}
         <h4>Time:</h4>
               <select id="time">
                   <option value="12:00">12:00</option>
@@ -158,21 +194,22 @@ class TripDetail extends React.Component {
               </select>
 
               <button onClick={() => this.addActivity(this.activityName.value, this.props.tripState.currentTrip)}>Add!</button>
-        {//tripId activityDate, startTime, activityName, activityType, activityLevel
-        }
         <br />
         <hr />
+        {/* get up vote id's for each activityID, get photo for each upvoter, render the voter onto the upvotes div*/}
+        {}
         {activitiesForThisDate.map((activity, key) => {
-          // console.log('rendering activities')
-          // console.log('this.state.editKeys:', this.state.editKeys)
-          // console.log('this.state.editKeys.inclues(key)', this.state.editKeys.includes(key))
+          let upVoters = this.getUpvotersByName(activity.id)
+          let downVoters = this.getDownvotersByName(activity.id)
           return (
-            <div key={activity.id}>
+            <div>
               <p>{moment(activity.start_time, 'HH:mm:ss').format('h:mm a')}</p>
               <div>{unescape(activity.description)}</div>
               <button onClick={() => this.showEdit(key)} >edit</button>
-              <button>upvote</button>
-              <button>downvote</button>
+              <button onClick={() => this.upVote(activity.id, activity.date_of_activity)}>upvote</button>
+              <button onClick={() => this.downVote(activity.id, activity.date_of_activity)}>downvote</button>
+              <div>Upvotes: {upVoters} </div>
+              <div>Downvotes: {downVoters} </div>
               {this.state.editActivityKey === key ? <EditActivity activity={activity} showEdit={this.showEdit} key={key} addActivity={this.addActivity}/> : null}
               <hr />
             </div>

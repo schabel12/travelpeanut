@@ -227,6 +227,30 @@ const deleteActivity = deleteData => (dispatch, getState) => {
   })
 }
 
+const upVote = upVoteData => (dispatch, getState) => {
+  const {activityId, userId, tripId, activityDate} = upVoteData
+  axios.post('/api/upVoteActivity', {params: {activityId, userId}})
+  .then(() => {
+    dispatch(getActivitiesForDate(activityDate, tripId))
+  })
+  .catch(err => {
+    console.log('couldnt upVote activity:', err)
+  })
+}
+
+const downVote = downVoteData => (dispatch, getState) => {
+  const {activityId, userId, tripId, activityDate} = downVoteData
+  axios.post('/api/downVoteActivity', {params: {activityId, userId}})
+  .then(() => {
+    dispatch(getActivitiesForDate(activityDate, tripId))
+  })
+  .catch(err => {
+    console.log('couldnt downVote activity:', err)
+  })
+}
+
+const getVotes = tripId
+
 module.exports = {
   createTrip,
   getAllTrips,
@@ -241,5 +265,7 @@ module.exports = {
   getActivitiesForDate,
   addActivityToItinerary,
   updateActivity,
-  deleteActivity
+  deleteActivity,
+  upVote,
+  downVote
 };
